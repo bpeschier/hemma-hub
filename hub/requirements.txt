@@ -1,0 +1,6 @@
+flynn
+websockets
+pynacl
+
+# windcentrale source
+aiohttp

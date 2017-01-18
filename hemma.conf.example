@@ -1,0 +1,28 @@
+[hub]
+plugins = p1 windcentrale dht solar ota
+sources = bridge windcentrale
+
+upstream = ws://localhost:8000/upstream/
+
+[local_auth]
+port = 1337
+host = 0.0.0.0
+
+[local_stream]
+port = 1338
+host = 0.0.0.0
+
+[keys]
+server_private_key = ...
+server_public_key = ...
+facade_signing_key = ...
+facade_verify_key = ...
+
+[bridge]
+url = ws://localhost:8765
+
+[windcentrale]
+mills = Het Rode Hert:2,De Vier Winden:1
+
+[ota]
+source = bridge
