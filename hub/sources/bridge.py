@@ -37,8 +37,12 @@ class BridgeSource(Source):
                 listener_task.cancel()
 
             if producer_task in done:
-                message = producer_task.result()
-                await hub.handle_incoming(self, flynn.loads(message))
+                message = flynn.loads(producer_task.result())
+
+                if 'id' in message:  # reply
+                    await self.set_result(message['id'], message)
+                else:
+                    await hub.handle_incoming(self, message)
             else:
                 producer_task.cancel()
 
@@ -56,6 +60,11 @@ class BridgeSource(Source):
             event.clear()
             del self.events[cmd_id]
             return self.results.pop(cmd_id, None)
+
+    async def set_result(self, command_id, data):
+        self.results[command_id] = data['data']
+        event = self.events.setdefault(command_id, asyncio.Event())
+        event.set()
 
     async def command(self, target_address, command, **kwargs):
         command_id = await self.get_command_id()

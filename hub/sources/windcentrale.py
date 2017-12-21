@@ -47,7 +47,6 @@ class WindcentralSource(Source):
                 await asyncio.sleep(5)
 
     async def get_task(self, hub):
-
         async with aiohttp.ClientSession() as session:
             fetchers = [asyncio.ensure_future(self.get_mill_info(session, mill, hub))
                         for mill, _ in self.mills]

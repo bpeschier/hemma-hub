@@ -29,12 +29,12 @@ class OtaPlugin(Plugin):
 
         await asyncio.sleep(3)
 
-        print(await self.source_target.request(0, 'ota.start', address=address))
+        print(await self.source_target.request(address, 'ota.start', address=address))
         for addr in range(0, hex_size, self.block_size):
             bsize = min(self.block_size, hex_size - addr)
             data = hex_file.tobinstr(start=addr, size=bsize)
             if len(data) > 0:
-                print(await self.source_target.request(0, 'ota.block', memaddr=addr, size=len(data), data=data))
+                print(await self.source_target.request(address, 'ota.block', memaddr=addr, size=len(data), data=data))
 
         await self.source_target.request(0, 'ota.end')
 

@@ -50,12 +50,17 @@ class Hub:
         return module.from_config(module_name, config, self)
 
     def add_tasks(self, loop):
-        for source in self.sources.values():
-            loop.create_task(source.get_task(self))
 
-        loop.create_task(self.get_local_auth())
+        if 'local_auth' in self.config:
+            loop.create_task(self.get_local_auth())
+
         if 'local_stream' in self.config:
             loop.create_task(self.get_local_stream())
+
+        for source in self.sources.values():
+            loop.create_task(source.get_task(self))
+            loop.create_task(self.handle_connect(source))
+
         loop.create_task(self.get_upstream())
         loop.create_task(self.get_requests())
 
@@ -123,6 +128,10 @@ class Hub:
     async def handle_incoming(self, source, message):
         for plugin in self.plugins.values():
             await plugin.on_source_message(source, message)
+
+    async def handle_connect(self, source):
+        for plugin in self.plugins.values():
+            await plugin.on_source_connect(source)
 
     async def reply(self, client, target_public_key, payload):
         box = Box(self.config['keys']['server_private_key'], target_public_key)

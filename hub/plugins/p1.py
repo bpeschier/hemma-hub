@@ -49,14 +49,16 @@ class P1Plugin(Plugin):
         # source.command(name='p1.get', address=self.meter_address, callback=self.handle_p1)
         pass
 
+    async def update_p1(self, data):
+        self.state = data
+        self.timestamp = int(datetime.now().timestamp() * 1000)
+
+        if self.state:
+            await self.broadcast(self.readings)
+
     async def on_source_message(self, source, message):
         if 'name' in message and message['name'] == 'p1':
-
-            self.state = message["data"]
-            self.timestamp = int(datetime.now().timestamp() * 1000)
-
-            if self.state:
-                await self.broadcast(self.readings)
+            await self.update_p1(message["data"])
 
     async def on_client_connect(self, client, client_key):
         if self.state:
